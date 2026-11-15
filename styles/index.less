@@ -1,0 +1,255 @@
+@import 'ui-variables';
+
+@gc-size: 14px;
+
+// ---------------------------------------------------------------------------
+// Checkbox (shared by rows and the toolbar's master checkbox)
+
+.gmail-checkbox-hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: default;
+  flex-shrink: 0;
+
+  &:hover {
+    background: fadeout(@text-color, 92%);
+  }
+
+  .gmail-checkbox {
+    position: relative;
+    box-sizing: border-box;
+    width: @gc-size;
+    height: @gc-size;
+    border: 1.5px solid @text-color-very-subtle;
+    border-radius: 2px;
+    background: transparent;
+    transition: background-color 80ms ease, border-color 80ms ease;
+  }
+
+  &:hover .gmail-checkbox {
+    border-color: @text-color-subtle;
+  }
+
+  // Rows: the thread list doesn't re-render cell contents when only the
+  // selection changes, but it does update the row's `selected` class.
+  &.checked .gmail-checkbox,
+  .list-item.selected & .gmail-checkbox {
+    background: @accent-primary;
+    border-color: @accent-primary;
+
+    // checkmark
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3.5px;
+      top: 0.5px;
+      width: 4px;
+      height: 8px;
+      border: solid @text-color-inverse;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  // master checkbox, partially selected: show a dash
+  &.checked.some .gmail-checkbox::after {
+    left: 2px;
+    top: 5px;
+    width: 7px;
+    height: 0;
+    border-width: 0 0 2px 0;
+    transform: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Row column
+
+.thread-list {
+  .list-column-GmailCheckbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    overflow: visible;
+  }
+
+  // In narrow (split view) rows the content is three lines high: pin the
+  // checkbox next to the first line like the star/unread icons.
+  &.thread-list-narrow .list-column-GmailCheckbox {
+    align-items: flex-start;
+    padding-top: 7px !important;
+  }
+
+  // On the open (focused) row the background is the accent colour, so draw
+  // the box in the inverse colour to keep it visible.
+  .list-item.focused .gmail-checkbox-hit .gmail-checkbox {
+    border-color: fadeout(@text-color-inverse, 30%);
+  }
+
+  // Mailspring's own checkbox column in "single panel" layout duplicates ours.
+  &.handler-list .list-column-Check {
+    display: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bulk toolbar above the thread list (split layout)
+
+.gmail-checkbox-toolbar {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  min-width: 0;
+  padding: 0 4px 0 4px;
+  box-sizing: border-box;
+  border-bottom: 1px solid @border-color-divider;
+  background: @background-primary;
+
+  .gmail-checkbox-master {
+    display: flex;
+    align-items: center;
+    margin-right: 6px;
+  }
+
+  .gmail-checkbox-caret {
+    width: 14px;
+    height: 26px;
+    position: relative;
+    border-radius: 3px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 11px;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid @text-color-subtle;
+    }
+
+    &:hover {
+      background: fadeout(@text-color, 92%);
+    }
+  }
+
+  .gmail-checkbox-actions {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+
+    .button-group {
+      display: flex;
+      margin-right: 6px;
+    }
+
+    .btn.btn-toolbar {
+      margin-right: 2px;
+    }
+  }
+
+  .gmail-checkbox-spacer {
+    flex: 1;
+  }
+
+  .gmail-checkbox-count {
+    font-size: @font-size-small;
+    color: @text-color-subtle;
+    white-space: nowrap;
+    padding: 0 8px;
+  }
+}
+
+.gmail-checkbox-select-menu {
+  min-width: 130px;
+  padding: 4px 0;
+
+  .item {
+    padding: 4px 16px;
+    font-size: @font-size-small;
+    cursor: default;
+
+    &:hover {
+      background: @accent-primary;
+      color: @text-color-inverse;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Split layout: checked threads and the open thread can coexist, so they need
+// to look different. Mailspring paints split-view selection like the open
+// thread (solid accent, inverted content); give checked rows the light tint
+// Mailspring uses for selection in its single-panel layout instead.
+
+.thread-list.handler-split .list-item.selected:not(.focused) {
+  background: @list-selected-bg;
+  color: @text-color;
+  -webkit-font-smoothing: auto;
+
+  .thread-icon,
+  .draft-icon,
+  .mail-important-icon,
+  .mail-label {
+    filter: none;
+  }
+
+  &.unread {
+    .subject,
+    .participants .unread-true {
+      font-weight: 600;
+    }
+  }
+
+  .list-column-HoverActions .inner {
+    background-image: linear-gradient(
+      to right,
+      rgb(from @list-selected-bg r g b / 0) 0%,
+      @list-selected-bg 50%,
+      @list-selected-bg 100%
+    );
+    .action {
+      filter: none;
+    }
+  }
+}
+
+// Mailspring's "N selected messages" placeholder belongs in an empty reading
+// pane; hide it while a thread is open next to checked threads.
+body.gmail-checkbox-reading .selected-items-stack {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Unread inbox count next to account names in the sidebar
+
+.account-sidebar .heading .gmail-checkbox-account-count {
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  line-height: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: @text-color-inverse;
+  background: @accent-primary;
+}
+
+// Colour bar before account names in the "All Accounts" rows (Inbox → account).
+// The colour itself is set per account by an injected stylesheet.
+.account-sidebar .gmail-account-row .name::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 0.9em;
+  margin-right: 6px;
+  vertical-align: -1px;
+  background: @text-color-very-subtle;
+}

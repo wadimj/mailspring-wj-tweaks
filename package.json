@@ -1,0 +1,24 @@
+{
+  "name": "mailspring-gmail-checkboxes",
+  "main": "./lib/main",
+  "version": "0.1.0",
+  "description": "Gmail-style checkboxes and bulk actions in the Mailspring thread list. Checking a thread selects it without opening it or marking it as read.",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "engines": {
+    "mailspring": ">=1.6.3"
+  },
+  "windowTypes": {
+    "default": true
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "license": "MIT"
+}
