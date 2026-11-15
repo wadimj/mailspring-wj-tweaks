@@ -1,13 +1,22 @@
-import { ComponentRegistry, WorkspaceStore, FocusedContentStore } from 'mailspring-exports';
+import {
+  ComponentRegistry,
+  WorkspaceStore,
+  FocusedContentStore,
+  PreferencesUIStore,
+} from 'mailspring-exports';
 import { ThreadList, ThreadListColumns } from './internals';
 import { CheckboxColumn } from './checkbox-column';
 import GmailBulkToolbar from './bulk-toolbar';
 import * as SplitHandler from './split-handler';
 import * as Sidebar from './sidebar';
 import * as HideProReminder from './hide-pro-reminder';
+import * as Settings from './settings';
 
 let originalColumns = null;
 let unlistenFocus = null;
+let preferencesTab = null;
+let enabledSub = null;
+let enabled = false;
 
 // Lets the stylesheet know whether a thread is open in the reading pane.
 function syncReadingClass() {
@@ -42,12 +51,22 @@ function remountThreadList() {
   }, 50);
 }
 
-export function activate() {
+function enableFeatures() {
+  if (enabled) return;
   const columns = ThreadListColumns();
   if (!columns || !Array.isArray(columns.Wide) || !Array.isArray(columns.Narrow)) {
     console.error('[gmail-checkboxes] Thread list columns not found; plugin disabled.');
     return;
   }
+  enabled = true;
+  document.body.classList.add('wj-tweaks-enabled');
+
+  // Shown as a bar directly above the list, like Gmail. Registered before the
+  // ThreadList re-registration so it renders above it.
+  ComponentRegistry.register(GmailBulkToolbar, {
+    location: WorkspaceStore.Location.ThreadList,
+    modes: ['split'],
+  });
 
   originalColumns = { Wide: columns.Wide, Narrow: columns.Narrow };
   columns.Wide = [CheckboxColumn, ...originalColumns.Wide];
@@ -56,27 +75,21 @@ export function activate() {
   SplitHandler.install();
   Sidebar.install();
   HideProReminder.install();
+
   unlistenFocus = FocusedContentStore.listen(syncReadingClass);
   syncReadingClass();
-
-  // Shown as a bar directly above the list, like Gmail. Registered before the
-  // ThreadList re-registration so it renders above it.
-  ComponentRegistry.register(GmailBulkToolbar, {
-    location: WorkspaceStore.Location.ThreadList,
-    modes: ['split'],
-  });
 }
 
-export function serialize() {}
-
-export function deactivate() {
+function disableFeatures() {
+  if (!enabled) return;
+  enabled = false;
   ComponentRegistry.unregister(GmailBulkToolbar);
   SplitHandler.uninstall();
   Sidebar.uninstall();
   HideProReminder.uninstall();
   if (unlistenFocus) unlistenFocus();
   unlistenFocus = null;
-  document.body.classList.remove('gmail-checkbox-reading');
+  document.body.classList.remove('gmail-checkbox-reading', 'wj-tweaks-enabled');
   const columns = ThreadListColumns();
   if (columns && originalColumns) {
     columns.Wide = originalColumns.Wide;
@@ -84,4 +97,39 @@ export function deactivate() {
     originalColumns = null;
     remountThreadList();
   }
+}
+
+function syncEnabled() {
+  if (Settings.get(Settings.KEYS.enabled)) {
+    enableFeatures();
+  } else {
+    disableFeatures();
+  }
+}
+
+export function activate() {
+  // The settings tab stays available even when the tweaks are switched off,
+  // so they can be switched back on.
+  preferencesTab = new PreferencesUIStore.TabItem({
+    tabId: 'WJTweaks',
+    displayName: 'WJ Tweaks',
+    componentClassFn: () => require('./preferences-tab').default,
+    order: 100,
+  });
+  PreferencesUIStore.registerPreferencesTab(preferencesTab);
+
+  enabledSub = Settings.onChange(Settings.KEYS.enabled, syncEnabled);
+  syncEnabled();
+}
+
+export function serialize() {}
+
+export function deactivate() {
+  if (enabledSub) enabledSub.dispose();
+  enabledSub = null;
+  if (preferencesTab) {
+    PreferencesUIStore.unregisterPreferencesTab(preferencesTab.tabId);
+    preferencesTab = null;
+  }
+  disableFeatures();
 }

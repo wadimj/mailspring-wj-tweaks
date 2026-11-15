@@ -21,7 +21,11 @@ A Mailspring plugin with Gmail-style checkboxes in the thread list, plus a few s
 - Each account heading shows the sum of the unread counts of its folders/labels. The top heading shows the unread inbox total.
 - The per-account rows under Inbox, Sent, etc. get the account's colour bar.
 - Folder/label icons are tinted with the label's colour, the one used for its pills in the thread list.
-- Mailspring's own `Mailspring` folder is hidden from the label lists. Snoozed mail is still under Snoozed.
+- Mailspring's own `Mailspring` folder is hidden from the label lists (can be turned off in *Preferences → WJ Tweaks*). Snoozed mail is still under Snoozed.
+
+## Settings
+
+*Preferences → WJ Tweaks* has the plugin's options, including a switch that turns all of the tweaks on or off without restarting. They are stored in Mailspring's `config.json` under `wj-tweaks.*`.
 
 ## Other
 

@@ -92,7 +92,7 @@
   }
 
   // Mailspring's own checkbox column in "single panel" layout duplicates ours.
-  &.handler-list .list-column-Check {
+  body.wj-tweaks-enabled &.handler-list .list-column-Check {
     display: none;
   }
 }
@@ -187,7 +187,7 @@
 // thread (solid accent, inverted content); give checked rows the light tint
 // Mailspring uses for selection in its single-panel layout instead.
 
-.thread-list.handler-split .list-item.selected:not(.focused) {
+body.wj-tweaks-enabled .thread-list.handler-split .list-item.selected:not(.focused) {
   background: @list-selected-bg;
   color: @text-color;
   -webkit-font-smoothing: auto;

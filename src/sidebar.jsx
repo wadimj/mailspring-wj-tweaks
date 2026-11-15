@@ -3,7 +3,7 @@
 //   its folder/label counts, the top heading the inbox total;
 // - account colour bars on the per-account rows under Inbox, Sent, etc.;
 // - folder/label icons tinted with the label's colour;
-// - Mailspring's own "Mailspring" folder is hidden from the label lists.
+// - Mailspring's own "Mailspring" folder is hidden from the label lists (optional).
 //
 // The sidebar builds its sections with SidebarSection's static factories and
 // renders each section's heading with OutlineView. We tag the account sections
@@ -12,6 +12,7 @@
 import { React, AccountStore, CategoryStore, ThreadCountsStore } from 'mailspring-exports';
 import { OutlineView } from 'mailspring-component-kit';
 import { SidebarSection, SidebarStore } from './internals';
+import * as Settings from './settings';
 
 const COUNT_PROP = 'gmailUnreadCount';
 
@@ -30,8 +31,10 @@ function labelsUnread(account) {
 }
 
 // Mailspring's own "Mailspring" folder (it holds Snoozed, which already has its
-// own sidebar entry) is hidden from each account's folder/label list.
-const isHiddenCategory = (cat) => !!cat && cat.path === 'Mailspring';
+// own sidebar entry) is hidden from each account's folder/label list, unless
+// turned off in Preferences → WJ Tweaks.
+const isHiddenCategory = (cat) =>
+  !!cat && cat.path === 'Mailspring' && Settings.get(Settings.KEYS.hideMailspringFolder);
 
 function visibleUserCategories(account) {
   return CategoryStore.userCategories(account).filter((cat) => !isHiddenCategory(cat));
@@ -167,6 +170,8 @@ export function install() {
   document.head.appendChild(colorStyle);
   writeColors();
   unlisteners.push(AccountStore.listen(writeColors), CategoryStore.listen(writeColors));
+  const settingSub = Settings.onChange(Settings.KEYS.hideMailspringFolder, rebuildSidebar);
+  unlisteners.push(() => settingSub.dispose());
 
   rebuildSidebar();
   return true;
