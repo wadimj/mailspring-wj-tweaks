@@ -253,3 +253,30 @@ body.gmail-checkbox-reading .selected-items-stack {
   vertical-align: -1px;
   background: @text-color-very-subtle;
 }
+
+// "Unread only" filter toggle next to the master checkbox.
+// A bare icon, no button chrome: grey when off, accent colour when on.
+.gmail-checkbox-toolbar .btn.btn-toolbar.gmail-checkbox-unread-filter {
+  margin-right: 8px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  box-shadow: none;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: none;
+    box-shadow: none;
+  }
+
+  img.content-mask {
+    background-color: @text-color-subtle;
+  }
+  &:hover img.content-mask {
+    background-color: @text-color;
+  }
+  &.active img.content-mask {
+    background-color: @accent-primary;
+  }
+}

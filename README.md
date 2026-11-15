@@ -14,6 +14,7 @@ A Mailspring plugin with Gmail-style checkboxes in the thread list, plus a few s
   - a master checkbox: click to select all loaded threads or clear the selection, or use the ▾ menu for All / None / Read / Unread / Starred / Unstarred
   - Archive, Spam, Trash, Mark read/unread, Star/Unstar, Move to folder, Apply label (labels only for Gmail-style accounts)
   - a "N selected" count
+- An "unread only" toggle next to the master checkbox filters the list to unread threads. It stays on when you switch folders. Threads you read while it's on stay in the list until you toggle it or change folder. Search results aren't filtered.
 - The reading-pane toolbar and keyboard shortcuts (e.g. `Delete`, `e`) still act on the open thread.
 
 ## Sidebar

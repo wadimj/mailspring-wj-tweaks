@@ -10,6 +10,7 @@ import {
 import { RetinaImg } from 'mailspring-component-kit';
 import { ThreadListStore, MovePickerPopover, LabelPickerPopover } from './internals';
 import { selectThreads, clearSelection, loadedThreads, selection } from './selection';
+import UnreadFilter from './unread-filter';
 
 const SOURCE = 'Gmail Checkboxes Toolbar';
 
@@ -48,14 +49,15 @@ function SelectMenu() {
   );
 }
 
-function ToolbarButton({ title, icon, onClick, buttonRef }) {
+function ToolbarButton({ title, icon, onClick, buttonRef, active, className = '' }) {
   return (
     <button
       ref={buttonRef}
       tabIndex={-1}
-      className="btn btn-toolbar gmail-checkbox-action"
+      className={`btn btn-toolbar gmail-checkbox-action ${className} ${active ? 'active' : ''}`}
       title={title}
       aria-label={title}
+      aria-pressed={active === undefined ? undefined : active}
       onClick={onClick}
     >
       <RetinaImg name={icon} mode={RetinaImg.Mode.ContentIsMask} aria-hidden="true" />
@@ -84,11 +86,13 @@ export default class GmailBulkToolbar extends React.Component {
     // Re-render when the list itself changes, to keep the "all selected"
     // state of the master checkbox correct as threads load or disappear.
     this._unlisten = store.listen(() => this.forceUpdate());
+    this._unlistenFilter = UnreadFilter.listen(() => this.forceUpdate());
   }
 
   componentWillUnmount() {
     if (this._sub) this._sub.dispose();
     if (this._unlisten) this._unlisten();
+    if (this._unlistenFilter) this._unlistenFilter();
   }
 
   // Master checkbox
@@ -251,6 +255,13 @@ export default class GmailBulkToolbar extends React.Component {
             onClick={this._onOpenSelectMenu}
           />
         </div>
+        <ToolbarButton
+          className="gmail-checkbox-unread-filter"
+          title={UnreadFilter.isActive() ? 'Show all messages' : 'Show unread only'}
+          icon="toolbar-markasunread.png"
+          active={UnreadFilter.isActive()}
+          onClick={() => UnreadFilter.toggle()}
+        />
         {this._renderActions()}
         <div className="gmail-checkbox-spacer" />
         {count > 0 && <div className="gmail-checkbox-count">{count} selected</div>}

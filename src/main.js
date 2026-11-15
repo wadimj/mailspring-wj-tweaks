@@ -11,6 +11,7 @@ import * as SplitHandler from './split-handler';
 import * as Sidebar from './sidebar';
 import * as HideProReminder from './hide-pro-reminder';
 import * as Settings from './settings';
+import UnreadFilter from './unread-filter';
 
 let originalColumns = null;
 let unlistenFocus = null;
@@ -73,6 +74,7 @@ function enableFeatures() {
   columns.Narrow = [CheckboxColumn, ...originalColumns.Narrow];
   remountThreadList();
   SplitHandler.install();
+  UnreadFilter.install();
   Sidebar.install();
   HideProReminder.install();
 
@@ -85,6 +87,7 @@ function disableFeatures() {
   enabled = false;
   ComponentRegistry.unregister(GmailBulkToolbar);
   SplitHandler.uninstall();
+  UnreadFilter.uninstall();
   Sidebar.uninstall();
   HideProReminder.uninstall();
   if (unlistenFocus) unlistenFocus();
