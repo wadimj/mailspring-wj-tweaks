@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "lib": ["es2017", "dom"],
-    "inlineSourceMap": true,
+    "inlineSourceMap": false,
     "outDir": "lib",
     "rootDir": "src",
     "skipLibCheck": true

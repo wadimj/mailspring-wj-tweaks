@@ -10,6 +10,7 @@ import GmailBulkToolbar from './bulk-toolbar';
 import * as SplitHandler from './split-handler';
 import * as Sidebar from './sidebar';
 import * as HideProReminder from './hide-pro-reminder';
+import * as ImportantFix from './important-fix';
 import * as Settings from './settings';
 import UnreadFilter from './unread-filter';
 
@@ -77,6 +78,7 @@ function enableFeatures() {
   UnreadFilter.install();
   Sidebar.install();
   HideProReminder.install();
+  ImportantFix.install();
 
   unlistenFocus = FocusedContentStore.listen(syncReadingClass);
   syncReadingClass();
@@ -90,6 +92,7 @@ function disableFeatures() {
   UnreadFilter.uninstall();
   Sidebar.uninstall();
   HideProReminder.uninstall();
+  ImportantFix.uninstall();
   if (unlistenFocus) unlistenFocus();
   unlistenFocus = null;
   document.body.classList.remove('gmail-checkbox-reading', 'wj-tweaks-enabled');
